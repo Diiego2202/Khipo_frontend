@@ -75,31 +75,30 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectClick }) => {
 
   return (
     <nav className="flex flex-col justify-between h-screen p-4">
-      <div className="flex justify-end mb-4 relative">
-        <button
-          className="bg-blue-500 text-black rounded hover:bg-blue-600 py-2 px-4"
-          onClick={() => setDropdownOpen(!dropdownOpen)}
-        >
-          {user?.name}
-          {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded shadow-xl z-50">
-              <button
-                className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-200"
-                onClick={handleLogout}
-              >
-                Sair
-              </button>
-            </div>
-          )}
-        </button>
-      </div>
-
       <div className="space-y-2">
+        <div className="flex mb-4 relative">
+          <button
+            className="font-semibold text-black rounded hover:bg-gray-300 py-2 px-4 w-full"
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+          >
+            {user?.name}
+            {dropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded shadow-xl z-50">
+                <button
+                  className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-200"
+                  onClick={handleLogout}
+                >
+                  Sair
+                </button>
+              </div>
+            )}
+          </button>
+        </div>
         {projectInfo.map((project) => (
           <button
             key={project.id}
             onClick={() => onProjectClick(project.id)}
-            className="flex items-center justify-between w-60 p-2 rounded-lg hover:bg-gray-300 bg-gray-200"
+            className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-gray-300 bg-gray-200"
           >
             <div className="flex items-center gap-x-2">
               <span className="w-2 h-2 bg-green-500 rounded-full"></span>
