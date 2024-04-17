@@ -27,7 +27,6 @@ const TaskList: React.FC<TaskListProps> = ({ status, projectId }) => {
         }
 
         const data = await response.json();
-        console.log(data);
         setTaskInfo(data);
         setLoading(false);
       } catch (error) {
@@ -73,41 +72,41 @@ const TaskList: React.FC<TaskListProps> = ({ status, projectId }) => {
 
   return (
     <div>
-      <nav className="mt-4 space-y-3 ">
+      <nav className="mt-4 space-y-3">
         {filteredTasks && filteredTasks.length > 0 ? (
           filteredTasks.map((task) => (
             <button
               key={task.id}
               onClick={() => handleOpenEditModal(task)}
-              className="w-full p-1 text-s font-medium text-black transform rounded-md bg-white"
+              className="w-full rounded-md bg-white"
             >
-              <div className="p-4">
-                <div className="border border-gray-200 p-6 rounded-lg">
-                  <h2 className="text-lg text-gray-900 font-medium title-font mb-2">
-                    {task.title}
-                  </h2>
-                  <h6>{formattedDate(task.date_creation)} - Autor</h6>
-                  <p className="leading-relaxed text-base text-black">
-                    {task.description}
-                  </p>
-                  <div className="flex mt-2">
-                    {task.tags &&
-                      task.tags.length > 0 &&
-                      task.tags.map((tag: any) => (
-                        <span
-                          key={tag.id} // Usar o id da tag como chave única
-                          className="mr-2 px-3 py-1 bg-gray-200 rounded-full text-sm"
-                        >
-                          {tag.title}
-                        </span>
-                      ))}
-                  </div>
+              <div className="border border-gray-300 p-6 rounded-lg shadow text-start">
+                <h2 className="text-xl text-gray-900 font-semibold mb-2">
+                  {task.title}
+                </h2>
+                <p className="mb-2 text-gray-500">
+                  {formattedDate(task.date_creation)} - Autor
+                </p>
+                <p className="leading-relaxed text-gray-500">
+                  {task.description}
+                </p>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {task.tags &&
+                    task.tags.length > 0 &&
+                    task.tags.map((tag: any) => (
+                      <span
+                        key={tag.id}
+                        className="px-3 py-1 bg-gray-200 rounded-md text-sm text-black"
+                      >
+                        {tag.title}
+                      </span>
+                    ))}
                 </div>
               </div>
             </button>
           ))
         ) : (
-          <p className="text-black">No tasks available</p>
+          <p></p>
         )}
       </nav>
 

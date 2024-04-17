@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from "react";
 import NewProjectModal from "./newProjectModal";
-import NewTaskModal from "./newTaskModal";
+
+interface Project {
+  id: number;
+  name: string;
+  description: string;
+  tasks: any[];
+}
 
 interface ProjectListProps {
   onProjectClick: (projectId: number) => void;
 }
 
 const ProjectList: React.FC<ProjectListProps> = ({ onProjectClick }) => {
-  const [projectInfo, setProjectInfo] = useState<any[]>([]);
+  const [projectInfo, setProjectInfo] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(
     null
   );
@@ -44,14 +49,6 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectClick }) => {
     setIsModalOpen(false);
   };
 
-  const openTaskModal = () => {
-    setIsTaskModalOpen(true);
-  };
-
-  const closeTaskModal = () => {
-    setIsTaskModalOpen(false);
-  };
-
   const handleProjectClick = (projectId: number) => {
     setSelectedProjectId(projectId);
     onProjectClick(projectId);
@@ -62,37 +59,36 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectClick }) => {
   }
 
   return (
-    <nav className="mt-4 space-y-3 ">
-      {projectInfo.map((project) => (
+    <nav className="flex flex-col justify-between h-screen p-4">
+      <div className="space-y-2">
+        {projectInfo.map((project) => (
+          <button
+            key={project.id}
+            onClick={() => handleProjectClick(project.id)}
+            className="flex items-center justify-between w-60 p-2 rounded-lg hover:bg-gray-300 bg-gray-200"
+          >
+            <div className="flex items-center justify-between gap-x-2 w-full">
+              <div className="flex items-center gap-x-2">
+                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                <span className="font-medium text-black ">{project.name}</span>
+              </div>
+              <span className="text-white bg-gray-800 px-2 py-1 rounded-md text-xs">
+                {project.tasks.length}
+              </span>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      <div className="flex">
+        {isModalOpen && <NewProjectModal onClose={closeModal} />}
         <button
-          key={project.id}
-          onClick={() => handleProjectClick(project.id)}
-          className="flex items-center justify-between w-60 p-2 text-s font-medium text-black transform rounded-lg hover:bg-gray-100 hover:text-gray-700"
+          className="w-full py-2 bg-gray-200 rounded-lg hover:bg-gray-300 text-black"
+          onClick={openModal}
         >
-          <div className="flex items-center gap-x-2 ">
-            <span className="w-2 h-2 bg-pink-500 rounded-full"></span>
-            <span>{project.name}</span>
-          </div>
+          + Novo Projeto
         </button>
-      ))}
-
-      {isModalOpen && <NewProjectModal onClose={closeModal} />}
-      <button
-        className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 text-black"
-        onClick={openModal}
-      >
-        + Novo Projeto
-      </button>
-
-      {isTaskModalOpen && (
-        <NewTaskModal onClose={closeTaskModal} projectId={selectedProjectId} />
-      )}
-      <button
-        className="px-4 py-2 bg-green-100 rounded-lg hover:bg-green-200 text-black"
-        onClick={openTaskModal}
-      >
-        + Nova Task
-      </button>
+      </div>
     </nav>
   );
 };

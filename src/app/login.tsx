@@ -1,6 +1,6 @@
 "use client";
 
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 const Login: React.FC = () => {
@@ -19,9 +19,7 @@ const Login: React.FC = () => {
     });
 
     const data = await response.json();
-    console.log(data);
     if (data.statusCode == 200) {
-      console.log("Login successful!");
       setErrorMessage("");
       router.push("/tasks");
     } else {
@@ -29,9 +27,13 @@ const Login: React.FC = () => {
     }
   };
 
+  const handleCadastro = () => {
+    router.push("/cadastro");
+  };
+
   return (
     <div className="bg-white p-8 rounded shadow-md w-[32rem]">
-      <h1 className="text-2xl font-semibold mb-4">Login</h1>
+      <h1 className="text-2xl font-bold mb-4 text-black">Login</h1>
 
       {errorMessage && <p className="text-red-500 mb-4">{errorMessage}</p>}
 
@@ -66,13 +68,20 @@ const Login: React.FC = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
       </div>
-
-      <button
-        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-        onClick={handleLogin}
-      >
-        Efetuar Login
-      </button>
+      <div className="space-y-2">
+        <button
+          className="bg-green-500 text-white rounded hover:bg-green-600 py-2 w-full"
+          onClick={handleLogin}
+        >
+          Entrar
+        </button>
+        <button
+          className="bg-blue-500 text-white rounded hover:bg-blue-600 py-2 w-full"
+          onClick={handleCadastro}
+        >
+          Cadastrar
+        </button>
+      </div>
     </div>
   );
 };

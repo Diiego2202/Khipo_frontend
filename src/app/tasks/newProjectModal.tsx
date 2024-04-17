@@ -62,10 +62,10 @@ const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose }) => {
             Cancelar
           </button>
           <button
-            className="px-4 py-2 text-white bg-green-500 rounded-lg hover:bg-green-600"
+            className="px-4 py-2 text-white bg-blue-400 rounded-lg hover:bg-blue-500"
             onClick={handleSubmit}
           >
-            Criar
+            Salvar
           </button>
         </div>
       </div>

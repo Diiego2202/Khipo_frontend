@@ -2,10 +2,22 @@
 
 import React, { useState } from "react";
 
+interface Tag {
+  title: string;
+}
+
+interface Task {
+  id: number;
+  title: string;
+  description: string;
+  tags: Tag[];
+  status: "Pending" | "InProgress" | "Completed";
+}
+
 interface EditTaskModalProps {
-  task: any;
+  task: Task;
   onClose: () => void;
-  onUpdate: (updatedTask: any) => void;
+  onUpdate: (updatedTask: Task) => void;
 }
 
 const EditTaskModal: React.FC<EditTaskModalProps> = ({
@@ -13,35 +25,87 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
   onClose,
   onUpdate,
 }) => {
-  const [title, setTitle] = useState(task.title);
-  const [description, setDescription] = useState(task.description);
-  const [tags, setTags] = useState<any[]>(task.tags || []);
-  const [tagInput, setTagInput] = useState("");
+  const [title, setTitle] = useState<string>(task.title);
+  const [description, setDescription] = useState<string>(task.description);
+  const [tags, setTags] = useState<Tag[]>(task.tags || []);
+  const [status, setStatus] = useState<"Pending" | "InProgress" | "Completed">(
+    task.status
+  );
+  const [tagInput, setTagInput] = useState<string>("");
 
   const handleAddTag = () => {
     if (tagInput && !tags.some((tag) => tag.title === tagInput)) {
-      const newTag = {
-        title: tagInput,
-        taskID: task.id,
-      };
-      setTags([...tags, newTag]);
+      setTags([...tags, { title: tagInput }]);
       setTagInput("");
     }
   };
 
-  const handleSubmit = () => {
-    const updatedTask = {
-      ...task,
-      title,
-      description,
-      tags,
-    };
+  const handleSubmit = async () => {
+    if (status === "Completed" && task.status !== "Completed") {
+      const updatedTask = {
+        id: task.id,
+        status,
+      };
 
-    onUpdate(updatedTask);
+      try {
+        const response = await fetch(`http://localhost:8000/task/${task.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedTask),
+        });
+
+        if (!response.ok) {
+          throw new Error("Erro ao atualizar o status da tarefa");
+        }
+
+        const updatedTaskData = await response.json();
+        onUpdate(updatedTaskData);
+        onClose();
+        window.location.reload(); // Recarregar a página após atualizar a tarefa
+      } catch (error) {
+        console.error("Erro ao atualizar o status da tarefa:", error);
+      }
+    } else if (status !== "Completed") {
+      const updatedTask = {
+        id: task.id,
+        title,
+        description,
+        status,
+        addTags: tags
+          .filter(
+            (tag) =>
+              !task.tags.some((existingTag) => existingTag.title === tag.title)
+          )
+          .map((tag) => tag.title),
+      };
+
+      try {
+        const response = await fetch(`http://localhost:8000/task/${task.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedTask),
+        });
+
+        if (!response.ok) {
+          throw new Error("Erro ao atualizar a tarefa");
+        }
+
+        const updatedTaskData = await response.json();
+        onUpdate(updatedTaskData);
+        onClose();
+        window.location.reload(); // Recarregar a página após atualizar a tarefa
+      } catch (error) {
+        console.error("Erro ao atualizar a tarefa:", error);
+      }
+    }
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
       <div className="bg-white rounded-lg p-6 w-96">
         <h2 className="text-xl font-semibold mb-4 text-black">Editar Tarefa</h2>
         <div className="mb-4">
@@ -51,15 +115,33 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
             className="mt-1 p-2 w-full border rounded-md text-black"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            disabled={status === "Completed"}
           />
         </div>
         <div className="mb-4">
-          <input
+          <textarea
             placeholder="Descrição"
             className="mt-1 p-2 w-full border rounded-md text-black"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            disabled={status === "Completed"}
           />
+        </div>
+        <div className="mb-4">
+          <select
+            className="mt-1 p-2 w-full border rounded-md text-black"
+            value={status}
+            onChange={(e) =>
+              setStatus(
+                e.target.value as "Pending" | "InProgress" | "Completed"
+              )
+            }
+            disabled={task.status === "Completed"}
+          >
+            <option value="Pending">Pendente</option>
+            <option value="InProgress">Em progresso</option>
+            <option value="Completed">Feito</option>
+          </select>
         </div>
         <div className="mb-4 flex items-center">
           <input
@@ -67,19 +149,21 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
             className="mr-2 p-2 w-full border rounded-md text-black"
             value={tagInput}
             onChange={(e) => setTagInput(e.target.value)}
+            disabled={status === "Completed"}
           />
           <button
-            className="px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
+            className="px-4 py-2 text-white bg-blue-500 rounded-lg whitespace-nowrap hover:bg-blue-600"
             onClick={handleAddTag}
+            disabled={status === "Completed"}
           >
-            Adicionar Tag
+            + Tag
           </button>
         </div>
-        <div className="mb-4">
+        <div className="mb-4 flex flex-wrap gap-2 mt-2">
           {tags.map((tag, index) => (
             <span
               key={index}
-              className="mr-2 px-3 py-1 bg-gray-200 rounded-full text-sm text-black"
+              className="px-3 py-1 bg-gray-200 rounded-md text-sm text-black"
             >
               {tag.title}
             </span>
@@ -93,10 +177,10 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
             Cancelar
           </button>
           <button
-            className="px-4 py-2 text-white bg-green-500 rounded-lg hover:bg-green-600"
+            className="px-4 py-2 text-white bg-blue-400 rounded-lg hover:bg-blue-500"
             onClick={handleSubmit}
           >
-            Atualizar
+            Salvar
           </button>
         </div>
       </div>

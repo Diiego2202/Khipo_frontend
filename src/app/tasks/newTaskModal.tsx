@@ -51,9 +51,9 @@ const NewTaskModal: React.FC<NewTaskModalProps> = ({ onClose, projectId }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-96">
-        <h2 className="text-xl font-semibold mb-4 text-black">Nova Tarefa</h2>
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+      <div className="bg-white p-6 w-96 border border-gray-300 p-6 rounded-lg shadow">
+        <h2 className="text-xl font-semibold mb-4 text-black">Criar Task</h2>
         <div className="mb-4">
           <input
             placeholder="Título"
@@ -64,7 +64,7 @@ const NewTaskModal: React.FC<NewTaskModalProps> = ({ onClose, projectId }) => {
           />
         </div>
         <div className="mb-4">
-          <input
+          <textarea
             placeholder="Descrição"
             className="mt-1 p-2 w-full border rounded-md text-black"
             value={description}
@@ -79,17 +79,17 @@ const NewTaskModal: React.FC<NewTaskModalProps> = ({ onClose, projectId }) => {
             onChange={(e) => setTagInput(e.target.value)}
           />
           <button
-            className="px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
+            className="px-4 py-2 text-white bg-blue-500 rounded-lg whitespace-nowrap hover:bg-blue-600"
             onClick={handleAddTag}
           >
-            Adicionar Tag
+            + Tag
           </button>
         </div>
-        <div className="mb-4">
+        <div className="mb-4 flex flex-wrap gap-2 mt-2">
           {tags.map((tag, index) => (
             <span
               key={index}
-              className="mr-2 px-3 py-1 bg-gray-200 rounded-full text-sm"
+              className="px-3 py-1 bg-gray-200 rounded-md text-sm text-black"
             >
               {tag}
             </span>
@@ -103,10 +103,10 @@ const NewTaskModal: React.FC<NewTaskModalProps> = ({ onClose, projectId }) => {
             Cancelar
           </button>
           <button
-            className="px-4 py-2 text-white bg-green-500 rounded-lg hover:bg-green-600"
+            className="px-4 py-2 text-white bg-blue-400 rounded-lg hover:bg-blue-500"
             onClick={handleSubmit}
           >
-            + Criar
+            Salvar
           </button>
         </div>
       </div>
