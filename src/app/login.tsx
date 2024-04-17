@@ -21,7 +21,8 @@ const Login: React.FC = () => {
     const data = await response.json();
     if (data.statusCode == 200) {
       setErrorMessage("");
-      router.push("/tasks");
+      const userID = data.userID;
+      router.push(`/tasks/${userID}`);
     } else {
       setErrorMessage(data.message);
     }

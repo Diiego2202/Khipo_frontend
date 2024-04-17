@@ -7,6 +7,7 @@ interface NewProjectModalProps {
 const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const userID = window.location.pathname.split("/").pop();
 
   const handleSubmit = async () => {
     try {
@@ -18,7 +19,7 @@ const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose }) => {
         body: JSON.stringify({
           name,
           description,
-          userID: 5, // Número fixo para o usuário
+          userID: Number(userID),
         }),
       });
 

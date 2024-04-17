@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState } from "react";
 
 interface Tag {
@@ -32,6 +30,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     task.status
   );
   const [tagInput, setTagInput] = useState<string>("");
+  const [removedTags, setRemovedTags] = useState<Tag[]>([]);
 
   const handleAddTag = () => {
     if (tagInput && !tags.some((tag) => tag.title === tagInput)) {
@@ -40,67 +39,45 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     }
   };
 
+  const handleDeleteTag = (tagToDelete: Tag) => {
+    setTags(tags.filter((tag) => tag.title !== tagToDelete.title));
+    setRemovedTags([...removedTags, tagToDelete]);
+  };
+
   const handleSubmit = async () => {
-    if (status === "Completed" && task.status !== "Completed") {
-      const updatedTask = {
-        id: task.id,
-        status,
-      };
+    const updatedTask = {
+      id: task.id,
+      title,
+      description,
+      status,
+      addTags: tags
+        .filter(
+          (tag) =>
+            !task.tags.some((existingTag) => existingTag.title === tag.title)
+        )
+        .map((tag) => tag.title),
+      removeTags: removedTags.map((tag) => tag.title),
+    };
 
-      try {
-        const response = await fetch(`http://localhost:8000/task/${task.id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updatedTask),
-        });
+    try {
+      const response = await fetch(`http://localhost:8000/task/${task.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedTask),
+      });
 
-        if (!response.ok) {
-          throw new Error("Erro ao atualizar o status da tarefa");
-        }
-
-        const updatedTaskData = await response.json();
-        onUpdate(updatedTaskData);
-        onClose();
-        window.location.reload(); // Recarregar a página após atualizar a tarefa
-      } catch (error) {
-        console.error("Erro ao atualizar o status da tarefa:", error);
+      if (!response.ok) {
+        throw new Error("Erro ao atualizar a tarefa");
       }
-    } else if (status !== "Completed") {
-      const updatedTask = {
-        id: task.id,
-        title,
-        description,
-        status,
-        addTags: tags
-          .filter(
-            (tag) =>
-              !task.tags.some((existingTag) => existingTag.title === tag.title)
-          )
-          .map((tag) => tag.title),
-      };
 
-      try {
-        const response = await fetch(`http://localhost:8000/task/${task.id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updatedTask),
-        });
-
-        if (!response.ok) {
-          throw new Error("Erro ao atualizar a tarefa");
-        }
-
-        const updatedTaskData = await response.json();
-        onUpdate(updatedTaskData);
-        onClose();
-        window.location.reload(); // Recarregar a página após atualizar a tarefa
-      } catch (error) {
-        console.error("Erro ao atualizar a tarefa:", error);
-      }
+      const updatedTaskData = await response.json();
+      onUpdate(updatedTaskData);
+      onClose();
+      window.location.reload();
+    } catch (error) {
+      console.error("Erro ao atualizar a tarefa:", error);
     }
   };
 
@@ -163,7 +140,8 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
           {tags.map((tag, index) => (
             <span
               key={index}
-              className="px-3 py-1 bg-gray-200 rounded-md text-sm text-black"
+              className="px-3 py-1 bg-gray-200 rounded-md text-sm text-black cursor-pointer"
+              onClick={() => handleDeleteTag(tag)}
             >
               {tag.title}
             </span>
